@@ -4,14 +4,14 @@ variable "vpc_cidr" {
 }
 
 variable "subnet_cidr_public" {
-    description = "Subnet CIDRS"
+    description = "Subnet public CIDRS"
     type = list(string)
 }
 variable "subnet_cidr_private" {
-    description = "Subnet CIDRS"
+    description = "Subnet private CIDRS"
     type = list(string)
 }
 variable "subnet_cidr_batabase" {
-    description = "Subnet CIDRS"
+    description = "Subnet database CIDRS"
     type = list(string)
 }
