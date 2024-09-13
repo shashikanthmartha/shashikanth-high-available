@@ -1,3 +1,11 @@
+variable "cluster_identifier" {
+  description = "The name of the RDS cluster"
+  type = string
+  default = "my-cluster"
+}
+variable "engine" {
+  description = "The name of the database engine to be used for this DB cluster"
+  type = string
   default = "mysql"
 }
 variable "engine_version" {
