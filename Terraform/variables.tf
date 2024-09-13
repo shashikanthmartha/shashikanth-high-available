@@ -15,3 +15,38 @@ variable "subnet_cidr_batabase" {
     description = "Subnet database CIDRS"
     type = list(string)
 }
+
+variable "cluster_identifier" {
+  description = "The name of the RDS cluster"
+  type = string
+   
+}
+variable "engine" {
+  description = "The name of the database engine to be used for this DB cluster"
+  type = string
+  
+}
+variable "engine_version" {
+  description = "The database engine version"
+  type = string
+   
+}
+variable "availability_zones" {
+    description = "The availability zones"
+    type = list(string)
+}
+variable "database_name" {
+    description = "The name for your database"
+    type = string
+    
+}
+variable "master_username" {
+    description = "The master username"
+    type = string
+     
+}
+variable "master_password" {
+    description = "The master password"
+    type = string
+ 
+}
