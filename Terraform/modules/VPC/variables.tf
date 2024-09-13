@@ -23,7 +23,7 @@ variable "subnet_names_public" {
 variable "subnet_names_private" {
     description = "Subnet names"
     type = list(string)
-    default = [ "privateSubnet1", "privateSubnet2" ]
+    default = [ "privateSubnet1", "privateSubnet2","privateSubnet3", "privateSubnet4" ]
 }
 variable "subnet_names_database" {
     description = "Subnet names"
