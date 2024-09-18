@@ -34,6 +34,7 @@ module "rds" {
   multi_az = var.multi_az
   publicly_accessible = var.publicly_accessible
   backup_retention_period = var.backup_retention_period
+  depends_on = [ module.db_subnet_group ]
 }
 
 
