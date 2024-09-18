@@ -1,0 +1,137 @@
+module "vpc" {
+  source = "./modules/VPC"
+  vpc_cidr = var.vpc_cidr
+  subnet_cidr_public = var.subnet_cidr_public
+  subnet_cidr_web_private = var.subnet_cidr_web_private
+  subnet_cidr_database = var.subnet_cidr_database
+  subnet_cidr_app_private = var.subnet_cidr_app_private
+}
+module "web_sg" {
+  source = "./modules/SG"
+  vpc_id = module.vpc.vpc_id
+}
+module "db_sg" {
+  source = "./modules/DB_SG"
+  vpc_id = module.vpc.vpc_id
+  web_sg_id = module.web_sg.security_group_id
+}
+module "ec2_sg" {
+  source = "./modules/launch_sg"
+  vpc_id = module.vpc.vpc_id
+}
+module "efs_sg" {
+  source = "./modules/efs_sg"
+  vpc_id = module.vpc.vpc_id
+  ec2_sg_id = [module.ec2_sg.security_group_id] 
+}
+module "elb_sg" {
+  source = "./modules/elb_sg"
+  alb_sg_ingress_rules=var.alb_sg_ingress_rules
+  alb_sg_egress_rules=var.alb_sg_egress_rules
+  
+}
+module "db_subnet_group" {
+  source = "./modules/aws_db_subnet_group"
+  db_subenet_ids = module.vpc.database_subnets
+}
+module "rds" {
+  source = "./modules/RDS"
+  cluster_identifier = var.cluster_identifier
+  engine = var.engine
+  engine_version = var.engine_version
+  availability_zones = module.vpc.database_subnets
+  database_name = var.database_name
+  master_username = var.master_username
+  master_password = var.master_password
+  db_subnet_group_name = module.db_subnet_group.db_subnet_group_name
+  db_security_group_ids = [module.db_sg.db_security_group_id]
+  db_instance_class = var.db_instance_class
+  multi_az = var.multi_az
+  publicly_accessible = var.publicly_accessible
+  backup_retention_period = var.backup_retention_period
+  depends_on = [ module.db_subnet_group ]
+}
+module "efs" {
+  source = "./modules/EFS&EFSMOUNT"
+  security_groups = [module.ef_sg.security_group_id]
+  subnet_app_private = module.vpc.app_private_subnets
+}
+module "route_53" {
+  source = "./modules/route_53"
+  elb_zone_id = module.ELB_web.web_elb_zone_id
+  elb_dns_name = module.ELB_web.web_elb_dns
+}
+module "aws_iam_instance_profile" {
+  source = "./modules/iam_instance_profile"
+}
+data "template_file" "user_data" {
+  template = file("templates/user_data.tpl")
+  vars = {
+    efs_file_system_id = module.efs.efs_file_system_id
+  }
+}
+module "aws_launch_template_app" {
+  source = "./modules/launchtemplateapp"
+  security_groups = [module.web_sg.security_group_id]
+  app_instance_type = var.app_instance_type
+  app_AMI = var.app_AMI
+  iam_instance_profile_name = module.aws_iam_instance_profile.iam_instance_profile_name
+  app_private = module.vpc.app_private_subnets
+  data = data.template_file.user_data
+}
+
+
+module "aws_launch_template_web" {
+  source = "./modules/launchtemplateweb"
+  security_groups = [module.web_sg.security_group_id]
+  web_instance_type = var.web_instance_type
+  web_AMI = var.web_AMI
+  iam_instance_profile_name = module.aws_iam_instance_profile.iam_instance_profile_name
+  web_private = module.vpc.web_private_subnets
+  data = data.template_file.user_data
+}
+module "route_53" {
+  source = "./modules/route_53"
+  elb_zone_id = module.ELB_web.web_elb_zone_id
+  elb_dns_name = module.ELB_web.web_elb_dns
+}
+module "ELB_web" {
+  source = "./modules/AWSELB_web"
+  elb_sg_id = module.elb_sg.elb_sg_id
+  cert_arn = module.route_53.cert_arn
+}
+# module "ELB_app" {
+#   source = "./modules/AWSELB_app"
+#   security_groups = [module.web_sg.security_group_id]
+# }
+module "aws_autoscaling_group_web" {
+  source = "./modules/aws_autoscalingweb"
+  launch_template_version = var.launch_template_version
+  vpc_zone_identifier = module.vpc.web_private_subnets
+  web_elb_name = module.ELB_web.elb_web
+  launch_template_id = module.aws_launch_template_web.launch_template_id_web
+  }
+module "aws_policyscaling_web" {
+  source = "./modules/autoscaling_policy"
+  aws_autoscaling_group_name_web = module.aws_autoscaling_group_web.aws_autoscaling_group_name_web
+  
+}
+# module "aws_autoscaling_group_app" {
+#   source = "./modules/aws_autoscalingapp"
+#   launch_configuration_app = module.aws_launch_configuration_app.launch_configuration_name_app
+#   aws_autoscaling_group_name_app = var.aws_autoscaling_group_name_app
+#   vpc_zone_identifier = module.vpc.app_private_subnets
+# }
+
+
+# module "aws_autoscaling_attachment_web" {
+#   source = "./modules/autoscalingattachmentweb"
+#   autoscaling_group_name_web = module.aws_autoscaling_group_web.aws_autoscaling_group_name_web
+#   elb_web = module.ELB_web.elb_web
+#   elb_app = module.ELB_app.elb_app
+# }
+# module "aws_autoscaling_attachment_app" {
+#   source = "./modules/autoscalingattachmentapp"
+#   autoscaling_group_name_app = module.aws_autoscaling_group_app.aws_autoscaling_group_name_app
+#   elb_app = module.ELB_app.elb_app
+# }
