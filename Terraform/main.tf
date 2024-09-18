@@ -30,6 +30,10 @@ module "rds" {
   master_password = var.master_password
   db_subnet_group_name = module.db_subnet_group.db_subnet_group_name
   db_security_group_ids = [module.db_sg.db_security_group_id]
+  db_instance_class = var.db_instance_class
+  multi_az = var.multi_az
+  publicly_accessible = var.publicly_accessible
+  backup_retention_period = var.backup_retention_period
 }
 
 
