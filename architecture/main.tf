@@ -69,3 +69,8 @@ module "auto_scaling" {
     ec2_sg_ingress_rules = var.ec2_sg_ingress_rules
     ec2_sg_egress_rules = var.ec2_sg_egress_rules
 }
+module "waf" {
+ source = "./modules/WAF"
+ env = var.env
+ app_alb_arn = module.auto_scaling.app_alb_arn
+}
