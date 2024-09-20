@@ -5,12 +5,12 @@ resource "aws_kms_key" "db_kms_key" {
 
 # Create an alias for the KMS key
 resource "aws_kms_alias" "db_kms_key_alias" {
-  name          = "shashi-rds/rds"
+  name          = "alias/shashi_rds/rds"
   target_key_id = aws_kms_key.db_kms_key.id
 }
 
 data "aws_kms_key" "db_kms_key" {
-  key_id = "ashashi-rds/rds"
+  key_id = "alias/shashi_rds/rds"
 }
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "${var.env}-rds-ssubnet-group"
@@ -51,7 +51,7 @@ resource "aws_ssm_parameter" "db_password" {
   name   = "/rds/${var.env}-rds/password"
   value  = var.rds_conf.multi_az == true ? random_password.root_password.result : "test"
   type   = "SecureString"
-  key_id = "shashi-rds/ssm"
+  key_id = "alias/shashi_rds/ssm"
 }
 resource "aws_security_group" "rds_sg" {
   name        = "${var.env}-rds-sg"
