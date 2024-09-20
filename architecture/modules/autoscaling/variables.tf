@@ -19,11 +19,11 @@ variable "instance_type" {
   
 }
 variable "auto_public_subnets" {
-  description = "The private subnets to use for the launch template"
-  type        = list(object({
-    id = string
-  }))
-  
+
+  description = "List of public subnet IDs for the load balancer"
+
+  type        = list(string)
+
 }
 variable "auto_private_subnets" {
 
