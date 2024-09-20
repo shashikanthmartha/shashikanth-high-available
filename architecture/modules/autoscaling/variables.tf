@@ -26,11 +26,11 @@ variable "auto_public_subnets" {
 
 }
 variable "auto_private_subnets" {
-
-  description = "List of private subnet IDs for the Auto Scaling group"
-
-  type        = list(string)
-
+  description = "List of private subnet IDs for the launch template"
+  type        = map(object({
+    name = string
+  }))
+  
 }
 variable "vpc_id" {
   description = "The VPC ID to use for the launch template"
