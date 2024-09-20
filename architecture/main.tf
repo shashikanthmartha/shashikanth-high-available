@@ -14,7 +14,7 @@ module "nat_gateway" {
     env = var.env
 }
 module "private_route_table" {
-    source = "./modules/private_route_table"
+    source = "./modules/Pravite_route&association"
     private_subnets = var.private_subnets
     env = var.env
     nat_gateway_ids = module.nat_gateway.nat_gateway_ids
