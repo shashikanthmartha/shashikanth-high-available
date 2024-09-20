@@ -74,7 +74,7 @@ resource "aws_lb" "app_alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = values(var.auto_public_subnets).*.id
+  subnets            = var.auto_public_subnets
 
   tags = {
     Name = "${var.env}-ApplicationLB"
@@ -172,7 +172,7 @@ resource "aws_autoscaling_group" "app_asg" {
   min_size            = 2
   max_size            = 3
   desired_capacity    = 3
-  vpc_zone_identifier = values(var.auto_private_subnets).*.id
+  vpc_zone_identifier = var.auto_private_subnets
   health_check_type   = "ELB"
   target_group_arns   = [aws_lb_target_group.app_tg.arn]
   lifecycle {
