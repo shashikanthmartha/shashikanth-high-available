@@ -48,7 +48,7 @@ resource "aws_launch_template" "app" {
   }
   network_interfaces {
     associate_public_ip_address = false
-    subnet_id                   = var.auto_private_subnets[0]
+    subnet_id                   = tolist(values(var.auto_private_subnets))[0].id
     security_groups             = [aws_security_group.ec2_sg.id]
   }
 
