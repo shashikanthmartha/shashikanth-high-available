@@ -19,9 +19,9 @@ on:
         - just for palning 
         required: true
   
-  # push:
-  #   branches:
-  #     - 'main'
+  push:
+    branches:
+      - 'main'
 
 env:
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
@@ -39,23 +39,23 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: ./Terraform
+        working-directory: ./architecture
       - name: Terraform Validate
         id: validate
         run: terraform validate
-        working-directory: ./Terraform
+        working-directory: ./architecture
       - name: Terraform Plan
         id: plan
         if: ${{ github.event.inputs.terraform_plan == 'ok'}}
         run: terraform plan
-        working-directory: ./Terraform
+        working-directory: ./architecture
       - name: Terraform Apply
         id: apply
         if: ${{ github.event.inputs.terraform_action == 'apply' && github.event.inputs.terraform_plan == 'ok'}}
         run: terraform ${{ github.event.inputs.terraform_action }} --auto-approve
-        working-directory: ./Terraform
+        working-directory: ./architecture
       - name: Terraform destroy
         id: destroy
         if: ${{ github.event.inputs.terraform_action == 'destroy' && github.event.inputs.terraform_plan == 'ok' }}
         run: terraform ${{ github.event.inputs.terraform_action }} --auto-approve
-        working-directory: ./Terraform
+        working-directory: ./architecture
