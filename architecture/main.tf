@@ -18,6 +18,7 @@ module "private_route_table" {
     private_subnets = var.private_subnets
     env = var.env
     nat_gateway_ids = module.nat_gateway.nat_gateway_ids
+    vpc_id = module.vpc.vpc_id
 }
 module "public_route_table" {
     source = "./modules/public_RT_RTA_IGW"
