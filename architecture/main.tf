@@ -20,8 +20,8 @@ module "private_route_table" {
     nat_gateway_ids = module.nat_gateway.nat_gateway_ids
 }
 module "public_route_table" {
-    source = "./modules/public_route_table"
-    public_subnets = var.public_subnets
+    source = "./modules/public_RT_RTA_IGW"
+    public_subnets = module.vpc.public_subnets
     env = var.env
     vpc_id = module.vpc.vpc_id
 }
@@ -41,18 +41,17 @@ module "efs" {
     ec2_sg_id = module.rdssg.rds_sg_id
 }
 data "template_file" "user_data" {
-  template = file("templates/user_data.tpl")
+  template = file("./templates/user_data.tpl")
   vars = {
   efs_file_system_id = module.efs.efs_file_system_id
   }
 }
 module "rout53" {
-    source = "./modules/rout53"
-    env = var.env
-    hosted_zone_name = var.hosted_zone_name
-    vpc_id = module.vpc.vpc_id
-    public_subnets = module.vpc.public_subnets
+    source = "./modules/ROUTE_53"
+    app_alb_dns_name=module.auto_scaling.app_alb_dns_name
+    app_alb_zone_id=module.auto_scaling.app_alb_zone_id
 }
+
 module "auto_scaling" {
     source = "./modules/autoscaling"
     env = var.env
