@@ -57,11 +57,11 @@ data "template_file" "user_data" {
   efs_file_system_id = module.efs.efs_file_system_id
   }
 }
-module "rout53" {
-    source = "./modules/ROUTE_53"
-    app_alb_dns_name=module.auto_scaling.app_alb_dns_name
-    app_alb_zone_id=module.auto_scaling.app_alb_zone_id
-}
+# module "rout53" {
+#     source = "./modules/ROUTE_53"
+#     app_alb_dns_name=module.auto_scaling.app_alb_dns_name
+#     app_alb_zone_id=module.auto_scaling.app_alb_zone_id
+# }
 
 
 module "auto_scaling" {
